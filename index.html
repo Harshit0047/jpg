@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>JPG to PNG Converter</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    #preview {
+      max-width: 400px;
+      margin-bottom: 10px;
+    }
+  </style>
+  <script>
+    $(document).ready(function() {
+      var fileInput = document.getElementById('fileInput');
+      var convertButton = document.getElementById('convertButton');
+      var previewImage = document.getElementById('preview');
+      var downloadLink = document.getElementById('downloadLink');
+
+      fileInput.addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        var reader = new FileReader();
+
+        reader.onload = function(e) {
+          previewImage.innerHTML = '<img src="' + e.target.result + '" alt="Preview" width="400">';
+        };
+
+        reader.readAsDataURL(file);
+      });
+
+      convertButton.addEventListener('click', function() {
+        var file = fileInput.files[0];
+        var formData = new FormData();
+
+        formData.append('file', file);
+
+        $.ajax({
+          url: 'convert.php', // Replace with the URL of your server-side conversion script
+          method: 'POST',
+          data: formData,
+          processData: false,
+          contentType: false,
+          success: function(response) {
+            previewImage.innerHTML = '<img src="' + response + '" alt="Converted" width="400">';
+            downloadLink.setAttribute('href', response);
+            downloadLink.setAttribute('download', 'converted.png');
+            downloadLink.style.display = 'block';
+          },
+          error: function() {
+            alert('Error converting the file.');
+          }
+        });
+      });
+    });
+  </script>
+</head>
+<body>
+  <h1>JPG to PNG Converter</h1>
+  <input type="file" id="fileInput">
+  <button id="convertButton">Convert to PNG</button>
+  <hr>
+  <h2>Preview</h2>
+  <div id="preview"></div>
+  <a id="downloadLink" style="display: none;">Download PNG</a>
+</body>
+</html>
