@@ -12,7 +12,7 @@
   <script>
     $(document).ready(function() {
       var fileInput = document.getElementById('fileInput');
-      var convertButton = document.getElementById('convertButton');
+      var downloadButton = document.getElementById('downloadButton');
       var previewImage = document.getElementById('preview');
       var downloadLink = document.getElementById('downloadLink');
 
@@ -22,33 +22,17 @@
 
         reader.onload = function(e) {
           previewImage.innerHTML = '<img src="' + e.target.result + '" alt="Preview" width="400">';
+          downloadButton.style.display = 'block';
         };
 
         reader.readAsDataURL(file);
       });
 
-      convertButton.addEventListener('click', function() {
-        var file = fileInput.files[0];
-        var formData = new FormData();
-
-        formData.append('file', file);
-
-        $.ajax({
-          url: 'convert.php', // Replace with the URL of your server-side conversion script
-          method: 'POST',
-          data: formData,
-          processData: false,
-          contentType: false,
-          success: function(response) {
-            previewImage.innerHTML = '<img src="' + response + '" alt="Converted" width="400">';
-            downloadLink.setAttribute('href', response);
-            downloadLink.setAttribute('download', 'converted.png');
-            downloadLink.style.display = 'block';
-          },
-          error: function() {
-            alert('Error converting the file.');
-          }
-        });
+      downloadButton.addEventListener('click', function() {
+        var imageSrc = previewImage.querySelector('img').src;
+        downloadLink.setAttribute('href', imageSrc);
+        downloadLink.setAttribute('download', 'converted.png');
+        downloadLink.click();
       });
     });
   </script>
@@ -56,10 +40,10 @@
 <body>
   <h1>JPG to PNG Converter</h1>
   <input type="file" id="fileInput">
-  <button id="convertButton">Convert to PNG</button>
   <hr>
   <h2>Preview</h2>
   <div id="preview"></div>
+  <button id="downloadButton" style="display: none;">Download PNG</button>
   <a id="downloadLink" style="display: none;">Download PNG</a>
 </body>
 </html>
